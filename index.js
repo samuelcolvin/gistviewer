@@ -5,20 +5,38 @@ const instructions = `
 <p>
   Render HTML files from gists.
 </p>
-<form method="GET">
-  <input type="text" name="gist-id" placeholder="Gist ID"/>
-  <input type="text" name="file-name" placeholder="file name (optional)"/>
+<form id="form" method="GET">
+  <input id="gist-id" type="text" name="gist-id" placeholder="Gist ID" required/>
+  <input id="file-name" type="text" name="file-name" placeholder="file name (optional)"/>
   <input type="submit" value="view">
 </form>
+<script>
+  const form_el = document.getElementById('form')
+  form_el.addEventListener('submit', function(e) {
+    e.preventDefault()
+    const gist_id = document.getElementById('gist-id').value
+    const file_name = document.getElementById('file-name').value
+    console.log('fields:', gist_id, file_name)
+    if (gist_id) {
+      let new_url = 'https://' + window.location.hostname + '/' + gist_id
+      if (file_name) {
+        new_url += '?file-name=' + file_name
+      }
+      window.location = new_url
+    }
+  })
+</script>
 `
 
 async function handle(request) {
   const url = new URL(request.url)
-  const gist_id = url.searchParams.get('gist-id')
+  const gist_id = url.pathname.substr(1) || url.searchParams.get('gist-id')
+  console.log('gist_id:', gist_id)
   if (!gist_id) {
     return new Response(instructions, {headers: {'content-type': 'text/html'}})
   }
   const file_name = url.searchParams.get('file-name')
+  console.log('file_name:', file_name)
   try {
     content = await get_html(gist_id, file_name, request)
     return new Response(content, {headers: {'content-type': 'text/html'}})
@@ -30,7 +48,6 @@ async function handle(request) {
 }
 
 async function get_html(gist_id, file_name, request) {
-  console.log('gist_id:', gist_id)
   const r = await fetch(`https://api.github.com/gists/${gist_id}`, request)
   console.log('response:', r)
   if (r.status !== 200) {
@@ -39,7 +56,6 @@ async function get_html(gist_id, file_name, request) {
   }
   const data = await r.json()
 
-  console.log('file_name:', file_name)
   console.log('response data:', data)
 
   const index_file = data.files['index.html']
