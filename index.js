@@ -12,9 +12,7 @@ const instructions = `
 </form>
 <p>
   See 
-  <a href="https://github.com/samuelcolvin/gistviewer">
-    github.com/samuelcolvin/gistviewer
-  </a>
+  <a href="https://github.com/samuelcolvin/gistviewer">github.com/samuelcolvin/gistviewer</a>
   for more details.
 </p>
 <script>
@@ -41,6 +39,9 @@ async function handle(request) {
   if (!gist_id) {
     return new Response(instructions, {headers: {'content-type': 'text/html'}})
   }
+  if (gist_id === 'favicon.ico') {
+    return fetch('https://scolvin.com/favicon.png', request)
+  }
   const file_name = url.searchParams.get('file-name')
   console.log('file_name:', file_name)
   try {
@@ -49,7 +50,7 @@ async function handle(request) {
   } catch (e) {
     console.error('error handling request:', request)
     console.error('error:', e)
-    return new Response(`\nError occurred:\n\n${e.message}\n${e.stack}\n`, {status: 500})
+    return new Response(`\nError occurred:\n\n${e.message}\n`, {status: 500})
   }
 }
 
