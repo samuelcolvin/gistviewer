@@ -10,9 +10,15 @@ const instructions = `
   <input id="file-name" type="text" name="file-name" placeholder="file name (optional)"/>
   <input type="submit" value="view">
 </form>
+<p>
+  See 
+  <a href="https://github.com/samuelcolvin/gistviewer">
+    github.com/samuelcolvin/gistviewer
+  </a>
+  for more details.
+</p>
 <script>
-  const form_el = document.getElementById('form')
-  form_el.addEventListener('submit', function(e) {
+  document.getElementById('form').addEventListener('submit', function(e) {
     e.preventDefault()
     const gist_id = document.getElementById('gist-id').value
     const file_name = document.getElementById('file-name').value
@@ -55,7 +61,6 @@ async function get_html(gist_id, file_name, request) {
     throw Error(`Error getting gist ${gist_id}, response status: ${r.status} response body:\n${body}`)
   }
   const data = await r.json()
-
   console.log('response data:', data)
 
   const index_file = data.files['index.html']
